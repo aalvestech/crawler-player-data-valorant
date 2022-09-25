@@ -17,6 +17,7 @@ AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 endpoint_matches = 'https://val.dakgg.io/api/v1/accounts/cqD-BjmHUWpiOIsk53scYDHVYl9KxnenL5J11czMRccVPsj0qwd3MifxF4PH_4su3NyF0dAff-VQJQ/matches'
 file_name = 'tracker_player_rayzem' 
 
+
 def upload_s3(data, file_name):
 
     time = datetime.today()
@@ -29,6 +30,7 @@ def upload_s3(data, file_name):
     # data = data.to_json(data)
     # data.seek(0)    
     s3.put_object(Bucket = AWS_S3_BUCKET, Body = data, Key = 'raw/' + file_name)
+
 
 def _get(endpoint : str) -> json:
 
