@@ -26,34 +26,57 @@ response = s3_client.get_object(Bucket = AWS_S3_BUCKET, Key = 'raw/tracker_playe
 
 data = response['Body'].read()
 
-# df_profile = pd.read_json(StringIO(data.decode('utf-8')))
-df_profile = pd.read_json(StringIO(data.decode('utf-8')))
-
-df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('data')
-df_profile = df_profile['data']
-df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records')))
-df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('segments')
-df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('segments')
+data_str = data.decode('utf-8')
+data_json = json.loads(data_str)
 
 
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json()))
-# # df_profile = df_profile['data.matches']
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records')))
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('data.expiryDate')
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('data.matches')
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('data.metadata.schema')
+expiryDate : str = data_json["data"]["expiryDate"]
+requestingPlayerAttributes : dict = data_json["data"]["requestingPlayerAttributes"]
+paginationType : str = data_json["data"]["paginationType"]
+metadata : dict = data_json["data"]["metadata"]
+matches : list = data_json["data"]["matches"]
 
+data = []
 
+for match in matches:
+    # data
+    attributes : dict = match["attributes"]
+    match_metadata : dict = match["metadata"]
+    expiryDate : str = match["expiryDate"]
+    
+    # more data
+    segments : list = match["segments"]
+    for segment in segments:
+        # data
+        segment_type: str = segment["type"]
+        attributes : dict = segment["attributes"]
+        segment_metadata : dict = segment["metadata"]
+        expiryDate : str = segment["expiryDate"]
+        
+        # more data
+        stats : dict = segment["stats"]
+        for k, v in stats.items():
+            row = {}
 
-# df_profile = pd.json_normalize(json.loads(df_profile.to_json(orient='records'))).explode('data.matches.segments')
+            row.update(attributes)
+            row.update(match_metadata)
+            row["expiryDate"] = expiryDate
 
+            row["segment_type"] = segment_type
+            row.update(attributes)
+            row.update(segment_metadata)
+            row["expiryDate"] = expiryDate
 
+            row["stat"] = k
+            row.update(v)
 
+            data.append(row)
 
+len(data)
 
+columns = data[0].keys()
 
+df = pd.DataFrame(data, columns=columns)
 
-# print(df_profile.columns)
+df
 
-
-print(df_profile)
