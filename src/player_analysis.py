@@ -30,6 +30,16 @@ data_str = data.decode('utf-8')
 data_json = json.loads(data_str)
 
 
+matches : list = data_json["data"]["matches"]
+
+list(matches[0]["segments"][0]["stats"]["grenadeCasts"].values())
+
+# matches[0]
+
+
+
+
+
 expiryDate : str = data_json["data"]["expiryDate"]
 requestingPlayerAttributes : dict = data_json["data"]["requestingPlayerAttributes"]
 paginationType : str = data_json["data"]["paginationType"]
@@ -54,23 +64,30 @@ for match in matches:
         expiryDate : str = segment["expiryDate"]
         
         # more data
+        stat_dict = {}
         stats : dict = segment["stats"]
-        for k, v in stats.items():
-            row = {}
+        for stat, stat_data in stats.items():
+            stat_keys = stat_data.keys()
+            stat_columns = [f'{stat}_{col}' for col in stat_keys]
+            stat_values = stat_data.values()
 
-            row.update(attributes)
-            row.update(match_metadata)
-            row["expiryDate"] = expiryDate
+            _stat_dict = {k: v for k, v in zip(stat_columns, stat_values)}
+            stat_dict.update(_stat_dict)
+            
+        row = {}
 
-            row["segment_type"] = segment_type
-            row.update(attributes)
-            row.update(segment_metadata)
-            row["expiryDate"] = expiryDate
+        row.update(attributes)
+        row.update(match_metadata)
+        row["expiryDate"] = expiryDate
 
-            row["stat"] = k
-            row.update(v)
+        row["segment_type"] = segment_type
+        row.update(attributes)
+        row.update(segment_metadata)
+        row["expiryDate"] = expiryDate
 
-            data.append(row)
+        row.update(stat_dict)
+
+        data.append(row)
 
 len(data)
 
@@ -79,4 +96,3 @@ columns = data[0].keys()
 df = pd.DataFrame(data, columns=columns)
 
 df
-
