@@ -18,7 +18,8 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
-endpoint_matches = 'https://api.tracker.gg/api/v2/valorant/standard/matches/riot/RayzenSama%236999?type=competitive&next={}'
+# endpoint_matches = 'https://api.tracker.gg/api/v2/valorant/standard/matches/riot/RayzenSama%236999?type=competitive&next={}'
+# endpoint_matches = 'https://api.tracker.gg/api/v2/valorant/standard/matches/riot/RayzenSama%236999?type=competitive'
 file_name = 'tracker_player_rayzem'
 
 
@@ -34,22 +35,27 @@ def upload_s3(data, file_name):
     s3.put_object(Bucket = AWS_S3_BUCKET, Body = data, Key = 'raw/' + file_name)
 
 
-def get_player_stats(endpoint : str) -> json:
+# def get_player_stats(endpoint : str) -> json:
+def get_player_stats() -> json:
+
     
     options = webdriver.ChromeOptions()
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
-    for page in range(0,9):
+    for page in range(0,10):
         
-        endpoint = endpoint.format(page)
-        driver.get(endpoint)
+        driver.get('https://api.tracker.gg/api/v2/valorant/standard/matches/riot/RayzenSama%236999?type=competitive&next={}'.format(page))
         data_pre = driver.find_element('xpath', '//pre').text
+        upload_s3(data_pre, file_name=file_name)
+        
+        time.sleep(5)
 
     driver.quit()
 
-    return data_pre
+    # return data_pre
 
 
-upload_s3(data=get_player_stats(endpoint_matches), file_name=file_name)
+# upload_s3(data=get_player_stats('https://api.tracker.gg/api/v2/valorant/standard/matches/riot/RayzenSama%236999?type=competitive&next={}'), file_name=file_name)
 
+get_player_stats()
