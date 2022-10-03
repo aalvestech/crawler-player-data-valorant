@@ -55,7 +55,7 @@ class AwsS3():
         s3 = boto3.client('s3')
         
         try:
-            
+
             response = s3.get_object(Bucket = AWS_S3_BUCKET, Key = file_name)
             data = response['Body'].read()
             data_str = data.decode('utf-8')
@@ -71,7 +71,7 @@ class AwsS3():
 
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(AWS_S3_BUCKET)
-        files_list = bucket.objects.filter(Prefix=path_read)
+        files_list = bucket.objects.filter(Prefix = path_read)
         files_list = list(files_list)
         del files_list[0]
 
