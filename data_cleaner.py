@@ -1,15 +1,6 @@
 from aws_s3 import AwsS3
-from datetime import datetime
 import pandas as pd
 import json
-from datetime import date, datetime
-import boto3
-from dotenv import load_dotenv
-import os
-import time
-
-
-load_dotenv()
 
 
 # AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
@@ -30,8 +21,10 @@ class DataCleaner():
         for file in files:
             file = file.key
 
-            data_json = AwsS3.get_file(path_read, file)
+            data_s3 = AwsS3.get_file(path_read, file)
 
+            data_json = json.loads(data_s3)
+            
             expiryDate : str = data_json["data"]["expiryDate"]
             requestingPlayerAttributes : dict = data_json["data"]["requestingPlayerAttributes"]
             paginationType : str = data_json["data"]["paginationType"]
@@ -87,6 +80,7 @@ class DataCleaner():
 
         df_final = pd.concat([df_aux, df_aux['rank_metadata'].apply(pd.Series)], axis=1)
 
-        data_final = df_final.to_csv()
+        data_final_parquet = df_final.to_csv()
+        file_format = '.csv'
 
-        AwsS3.upload_file(data_final, path_write)
+        AwsS3.upload_file(data_final_parquet, path_write, file_format)

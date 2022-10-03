@@ -21,8 +21,10 @@ class Crawler():
             data_pre = driver.find_element('xpath', '//pre').text
 
             time.sleep(5)
+
+            file_format = '.txt'
             
-            AwsS3.upload_file(data_pre, path_write)
+            AwsS3.upload_file(data_pre, path_write, file_format)
 
         driver.quit()
 

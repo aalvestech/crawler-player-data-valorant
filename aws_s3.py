@@ -15,7 +15,7 @@ AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 class AwsS3():
 
     
-    def upload_file(data : object, path : str) -> bool:
+    def upload_file(data : object, path : str, file_format) -> bool:
 
         """
             Upload a file to an S3 bucket
@@ -25,10 +25,8 @@ class AwsS3():
             :return: True if file was uploaded, else False
         """
 
-
-
         date = datetime.now().strftime("_%Y%m%d_%H%M%S")
-        file_name = 'matches_result_rayzensama{}{}'.format(date, '.csv')
+        file_name = 'matches_result_rayzensama{}{}'.format(date, file_format)
         input = path + file_name
 
         
@@ -56,15 +54,15 @@ class AwsS3():
         """
         s3 = boto3.client('s3')
         
-        # try:
-        response = s3.get_object(Bucket = AWS_S3_BUCKET, Key = file_name)
-        data = response['Body'].read()
-        data_str = data.decode('utf-8')
+        try:
+            
+            response = s3.get_object(Bucket = AWS_S3_BUCKET, Key = file_name)
+            data = response['Body'].read()
+            data_str = data.decode('utf-8')
 
-        # except ClientError as e:
-            # logging.error(e)
+        except ClientError as e:
+            logging.error(e)
 
-            # return False
 
         return data_str
         
