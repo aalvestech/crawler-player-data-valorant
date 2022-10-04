@@ -80,7 +80,10 @@ class DataCleaner():
 
         df_final = pd.concat([df_aux, df_aux['rank_metadata'].apply(pd.Series)], axis=1)
 
+        df_final.to_csv('matches.csv')
+
         data_final_parquet = df_final.to_csv()
+
         file_format = '.csv'
 
         AwsS3.upload_file(data_final_parquet, path_write, file_format)
