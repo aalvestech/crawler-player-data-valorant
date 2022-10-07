@@ -9,7 +9,7 @@ class Crawler():
 
         options = webdriver.ChromeOptions()
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        driver = webdriver.Remote('http://127.0.0.1:4444/wd/hub', options = options)
 
         path_write = 'raw/trackergg/matches_report/'
 
@@ -25,6 +25,28 @@ class Crawler():
             file_format = '.txt'
             
             AwsS3.upload_file(data_pre, path_write, file_format)
+
+        driver.quit()
+
+        return data_pre
+
+    
+    def get_gun_report() -> str:
+
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+        path_write = 'raw/trackergg/gun_report/'
+
+
+            
+        driver.get('https://api.tracker.gg/api/v2/valorant/standard/profile/riot/RayzenSama%236999/segments/weapon?playlist=competitive&seasonId=')
+        
+        data_pre = driver.find_element('xpath', '//pre').text
+        file_format = '.txt'
+        
+        AwsS3.upload_file(data_pre, path_write, file_format)
 
         driver.quit()
 

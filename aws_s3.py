@@ -26,7 +26,7 @@ class AwsS3():
         """
 
         date = datetime.now().strftime("_%Y%m%d_%H%M%S")
-        file_name = 'matches_result_rayzensama{}{}'.format(date, file_format)
+        file_name = 'valorant_reports{}{}'.format(date, file_format)
         input = path + file_name
 
         
@@ -73,6 +73,10 @@ class AwsS3():
         bucket = s3.Bucket(AWS_S3_BUCKET)
         files_list = bucket.objects.filter(Prefix = path_read)
         files_list = list(files_list)
-        del files_list[0]
+        
+        if len(files_list) > 1: 
+            del files_list[0]
+        else:
+            pass
 
         return files_list
