@@ -110,7 +110,7 @@ class DataCleaner():
 
                 data.append(row)
 
-        df_final = pd.DataFrame(data)
+        df_final = pd.json_normalize(json.loads(json.dumps(data)))
 
         df_final.to_csv('guns.csv')
 
